@@ -1,0 +1,65 @@
+groups:
+  - name: rag_security
+    rules:
+      - alert: HighInjectionRisk
+        expr: rate(rag_security_blocks_total{reason="injection"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High prompt injection rate detected"
+          description: "More than 0.1 injection blocks/sec over last 5 minutes"
+
+      - alert: PIILeakageRate
+        expr: rate(rag_security_pii_entities_sum[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated PII detection rate"
+          description: "More than 5 PII entities/sec detected across requests"
+
+      - alert: MaliciousFileUploads
+        expr: increase(rag_security_file_rejections_total{reason="malicious"}[10m]) > 3
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Multiple malicious file upload attempts"
+          description: "More than 3 malicious files detected in last 10 minutes"
+
+  - name: rag_quality
+    rules:
+      - alert: LowConfidenceAnswers
+        expr: histogram_quantile(0.5, rate(rag_confidence_score_bucket[10m])) < 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Median answer confidence below 50%"
+
+      - alert: HighHallucinationRisk
+        expr: histogram_quantile(0.9, rate(rag_hallucination_risk_bucket[10m])) > 0.7
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "P90 hallucination risk above 70%"
+
+  - name: rag_availability
+    rules:
+      - alert: HighErrorRate
+        expr: rate(rag_errors_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate above 5%"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(rag_request_latency_seconds_bucket[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "P95 request latency above 10 seconds"

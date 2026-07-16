@@ -1,0 +1,97 @@
+# render.yaml — Render.com deployment configuration
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy with: render blueprint
+# Or: connect GitHub repo in Render dashboard and point to this file
+
+services:
+  - type: web
+    name: enterprise-rag-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free          # upgrade to starter ($7/mo) for persistent disk + no sleep
+
+    # Render free tier: sleeps after 15 min inactivity, 512 MB RAM
+    # Starter tier: always on, 512 MB RAM, custom domains
+
+    healthCheckPath: /api/v2/health
+
+    envVars:
+      - key: ENV
+        value: prod
+
+      # ── LLM — OpenRouter ─────────────────────────────────────────────────
+      - key: OPENAI_API_KEY
+        sync: false         # set manually in Render dashboard
+      - key: OPENAI_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: OPENAI_MODEL
+        value: openai/gpt-4o-mini
+      - key: OPENAI_TEMPERATURE
+        value: "0.0"
+
+      # ── Qdrant Cloud ──────────────────────────────────────────────────────
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_COLLECTION
+        value: documents
+
+      # ── Neo4j Aura ────────────────────────────────────────────────────────
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        value: neo4j
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: NEO4J_DATABASE
+        value: neo4j
+      - key: GRAPH_HOP_LIMIT
+        value: "2"
+
+      # ── Supabase Storage ──────────────────────────────────────────────────
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: rag-documents
+
+      # ── Security ──────────────────────────────────────────────────────────
+      - key: SECURITY_ENABLED
+        value: "true"
+      - key: SECURITY_INJECTION_THRESHOLD
+        value: "0.7"
+      - key: SECURITY_BLOCK_ON_PII
+        value: "false"
+      - key: SECURITY_PII_SCORE_THRESHOLD
+        value: "0.4"
+      - key: SECURITY_MAX_FILE_SIZE_MB
+        value: "50"
+      - key: SECURITY_AUDIT_LOG_ENABLED
+        value: "true"
+
+      # ── Retrieval ─────────────────────────────────────────────────────────
+      - key: BM25_TOP_K
+        value: "20"
+      - key: VECTOR_TOP_K
+        value: "20"
+      - key: HYBRID_TOP_K
+        value: "10"
+      - key: RRF_K
+        value: "60"
+      - key: QUERY_EXPANSION_MAX
+        value: "3"
+
+      # ── Prometheus (disable on free tier — no persistent port) ────────────
+      - key: METRICS_ENABLED
+        value: "false"
+
+      # ── LangSmith (optional) ──────────────────────────────────────────────
+      - key: LANGCHAIN_TRACING_V2
+        value: "false"
+      - key: LANGCHAIN_API_KEY
+        sync: false
+      - key: LANGCHAIN_PROJECT
+        value: enterprise-rag

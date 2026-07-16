@@ -1,0 +1,226 @@
+{
+  "__inputs": [],
+  "__elements": {},
+  "__requires": [
+    {"type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0"},
+    {"type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0"},
+    {"type": "panel", "id": "stat", "name": "Stat", "version": ""},
+    {"type": "panel", "id": "timeseries", "name": "Time series", "version": ""},
+    {"type": "panel", "id": "gauge", "name": "Gauge", "version": ""},
+    {"type": "panel", "id": "bargauge", "name": "Bar gauge", "version": ""}
+  ],
+  "annotations": {"list": []},
+  "description": "Enterprise Agentic RAG — Security, Quality, and Performance",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "id": 1,
+      "title": "🔐 Security",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "thresholds": {"steps": [
+          {"color": "green", "value": null},
+          {"color": "yellow", "value": 1},
+          {"color": "red", "value": 10}
+        ]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 1},
+      "id": 2,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto", "textMode": "auto", "colorMode": "background"},
+      "title": "Security Blocks (5m)",
+      "type": "stat",
+      "targets": [{"expr": "increase(rag_security_blocks_total[5m])", "legendFormat": "Blocks"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "min": 0, "max": 1,
+          "thresholds": {"steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 0.5}, {"color": "red", "value": 0.7}]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 1},
+      "id": 3,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto"},
+      "title": "Avg Injection Risk",
+      "type": "gauge",
+      "targets": [{"expr": "rate(rag_security_injection_risk_sum[5m]) / rate(rag_security_injection_risk_count[5m])", "legendFormat": "Risk"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "thresholds": {"steps": [
+          {"color": "green", "value": null}, {"color": "yellow", "value": 5}, {"color": "red", "value": 20}
+        ]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 1},
+      "id": 4,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto", "colorMode": "background"},
+      "title": "PII Entities Detected (5m)",
+      "type": "stat",
+      "targets": [{"expr": "increase(rag_security_pii_entities_sum[5m])", "legendFormat": "PII"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "thresholds": {"steps": [
+          {"color": "red", "value": null}, {"color": "green", "value": 1}
+        ]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 1},
+      "id": 5,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto", "colorMode": "background"},
+      "title": "Presidio Available",
+      "type": "stat",
+      "targets": [{"expr": "rag_security_presidio_available", "legendFormat": "Presidio"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {}},
+      "gridPos": {"h": 4, "w": 8, "x": 16, "y": 1},
+      "id": 6,
+      "options": {"orientation": "auto"},
+      "title": "Blocks by Reason",
+      "type": "bargauge",
+      "targets": [{"expr": "increase(rag_security_blocks_total[1h])", "legendFormat": "{{reason}}"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {"unit": "reqps"}},
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 5},
+      "id": 7,
+      "options": {},
+      "title": "Security Checks/sec",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "rate(rag_security_checks_total[1m])", "legendFormat": "Total checks"},
+        {"expr": "rate(rag_security_blocks_total[1m])", "legendFormat": "Blocks"}
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 5},
+      "id": 8,
+      "options": {},
+      "title": "Security Latency (p50/p95/p99)",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "histogram_quantile(0.50, rate(rag_security_latency_seconds_bucket[5m]))", "legendFormat": "p50"},
+        {"expr": "histogram_quantile(0.95, rate(rag_security_latency_seconds_bucket[5m]))", "legendFormat": "p95"},
+        {"expr": "histogram_quantile(0.99, rate(rag_security_latency_seconds_bucket[5m]))", "legendFormat": "p99"}
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 11},
+      "id": 9,
+      "title": "📊 Query Quality",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "min": 0, "max": 1,
+          "thresholds": {"steps": [{"color": "red", "value": null}, {"color": "yellow", "value": 0.5}, {"color": "green", "value": 0.7}]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 12},
+      "id": 10,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto"},
+      "title": "Avg Confidence Score",
+      "type": "gauge",
+      "targets": [{"expr": "rate(rag_confidence_score_sum[5m]) / rate(rag_confidence_score_count[5m])", "legendFormat": "Confidence"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "thresholds"}, "min": 0, "max": 1,
+          "thresholds": {"steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 0.3}, {"color": "red", "value": 0.6}]}}
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 12},
+      "id": 11,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto"},
+      "title": "Avg Hallucination Risk",
+      "type": "gauge",
+      "targets": [{"expr": "rate(rag_hallucination_risk_sum[5m]) / rate(rag_hallucination_risk_count[5m])", "legendFormat": "Risk"}]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {"thresholds": {"steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 12},
+      "id": 12,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "title": "Contradictions (5m)",
+      "type": "stat",
+      "targets": [{"expr": "increase(rag_contradictions_total[5m])", "legendFormat": "Contradictions"}]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 16},
+      "id": 13,
+      "title": "⚡ Performance",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 17},
+      "id": 14,
+      "options": {},
+      "title": "E2E Request Latency (p50/p95)",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "histogram_quantile(0.50, rate(rag_request_latency_seconds_bucket[5m]))", "legendFormat": "p50 {{query_type}}"},
+        {"expr": "histogram_quantile(0.95, rate(rag_request_latency_seconds_bucket[5m]))", "legendFormat": "p95 {{query_type}}"}
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {}},
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 17},
+      "id": 15,
+      "options": {},
+      "title": "Requests/sec by Status",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "rate(rag_requests_total{status='ok'}[1m])", "legendFormat": "OK {{query_type}}"},
+        {"expr": "rate(rag_requests_total{status='error'}[1m])", "legendFormat": "Error"},
+        {"expr": "rate(rag_requests_total{status='blocked'}[1m])", "legendFormat": "Blocked"}
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 23},
+      "id": 16,
+      "options": {},
+      "title": "Phase Latency Breakdown",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='security'}[5m]))", "legendFormat": "Security"},
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='plan'}[5m]))", "legendFormat": "Planner"},
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='retrieval'}[5m]))", "legendFormat": "Retrieval"},
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='graph'}[5m]))", "legendFormat": "Graph"},
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='generation'}[5m]))", "legendFormat": "LLM"},
+        {"expr": "histogram_quantile(0.95, rate(rag_phase_latency_seconds_bucket{phase='verification'}[5m]))", "legendFormat": "Verification"}
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["rag", "security", "ai"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Enterprise Agentic RAG",
+  "uid": "enterprise-rag-v2",
+  "version": 1
+}
