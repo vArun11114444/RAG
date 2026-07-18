@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Download spaCy model (Presidio + KG entity extraction)
-RUN /install/bin/python -m spacy download en_core_web_sm
+RUN python3 -m spacy download en_core_web_sm
 
 # ── Runtime stage ──────────────────────────────────────────────────────────────
 FROM python:3.11-slim AS runtime
